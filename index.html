@@ -511,6 +511,9 @@
     <button class="tab active" onclick="showTab('dashboard', this)">דשבורד</button>
     <button class="tab"        onclick="showTab('opps',      this)">הזדמנויות</button>
     <button class="tab"        onclick="showTab('laws',      this)">חוקי ברזל</button>
+        <button class="tab-btn" onclick="_csvSwitchTab('positions')">פוזיציות</button>
+        <button class="tab-btn" onclick="_csvSwitchTab('pnl')">P&amp;L</button>
+        <button class="tab-btn" onclick="_csvSwitchTab('executions')">ביצועים</button>
   </div>
 
   <!-- ==================== DASHBOARD ==================== -->
@@ -1147,5 +1150,50 @@
     buildChart();
     updateChartStatus();
   </script>
+
+  <div id="tab-positions" class="tab-content" style="display:none;padding:20px">
+    <h3 style="color:#7eb8e0;margin-bottom:12px">פוזיציות פתוחות - do2_POSITIONS.csv</h3>
+    <div id="positions-table">טוען...</div>
+  </div>
+  <div id="tab-pnl" class="tab-content" style="display:none;padding:20px">
+    <h3 style="color:#7eb8e0;margin-bottom:12px">מזומן ו-P&L - do3_CASH_PNL.csv</h3>
+    <div id="pnl-table">טוען...</div>
+  </div>
+  <div id="tab-executions" class="tab-content" style="display:none;padding:20px">
+    <h3 style="color:#7eb8e0;margin-bottom:12px">ביצועי עסקאות - do1_EXECUTIONS.csv</h3>
+    <div id="executions-table">טוען...</div>
+  </div>
+
+<script>
+(function(){
+const BASE = 'https://raw.githubusercontent.com/avi7756-design/a17-trading/main/';
+function parseCSV(t){
+  const L=t.trim().split('\n').filter(l=>l.trim());
+  if(L.length<2)return{headers:[],rows:[]};
+  const H=L[0].split(',').map(h=>h.trim().replace(/"/g,''));
+  const R=L.slice(1).map(l=>{const c=[];let s='',q=0;for(const x of l){if(x==='"')q=!q;else if(x===','&&!q){c.push(s.trim());s='';}else s+=x;}c.push(s.trim());return c;});
+  return{headers:H,rows:R};
+}
+function renderTable(d,id){
+  const el=document.getElementById(id);if(!el)return;
+  if(!d.rows.length){el.innerHTML='<p style="color:#888;padding:16px">אין נתונים</p>';return;}
+  let h='<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:13px">';
+  h+='<tr>'+d.headers.map(x=>`<th style="padding:8px 10px;background:#1a3a5c;color:#e0e8f0;text-align:right;white-space:nowrap">${x}</th>`).join('')+'</tr>';
+  d.rows.forEach((r,i)=>{h+=`<tr style="background:${i%2?'#112540':'#0d1f35'}">`;h+=r.map(c=>`<td style="padding:6px 10px;color:#c8d8e8;border-bottom:1px solid #1a3050;text-align:right;white-space:nowrap">${c||'-'}</td>`).join('');h+='</tr>';});
+  h+='</table></div>';el.innerHTML=h;
+}
+async function loadCSV(file,id){
+  try{const r=await fetch(BASE+file+'?t='+Date.now());if(!r.ok)throw 0;renderTable(parseCSV(await r.text()),id);}
+  catch{const el=document.getElementById(id);if(el)el.innerHTML='<p style="color:#e05050;padding:16px">לא נמצא: '+file+'</p>';}
+}
+window._csvSwitchTab=function(name){
+  document.querySelectorAll('.tab-content').forEach(e=>e.style.display='none');
+  const t=document.getElementById('tab-'+name);if(t)t.style.display='block';
+  if(name==='positions')loadCSV('do2_POSITIONS.csv','positions-table');
+  if(name==='pnl')loadCSV('do3_CASH_PNL.csv','pnl-table');
+  if(name==='executions')loadCSV('do1_EXECUTIONS.csv','executions-table');
+};
+})();
+</script>
 </body>
 </html>
