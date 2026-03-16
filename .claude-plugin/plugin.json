@@ -1,0 +1,9 @@
+{
+  "name": "v17-hunter",
+  "version": "0.1.0",
+  "description": "Market anomaly hunter for v17 trading system - monitors VIX and SPY, alerts on elevated volatility, and surfaces actionable setups like VCP breakouts.",
+  "author": {
+    "name": "חזן"
+  },
+  "keywords": ["trading", "vix", "spy", "vcp", "market-anomaly", "volatility"]
+}
