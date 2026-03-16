@@ -511,9 +511,9 @@
     <button class="tab active" onclick="showTab('dashboard', this)">דשבורד</button>
     <button class="tab"        onclick="showTab('opps',      this)">הזדמנויות</button>
     <button class="tab"        onclick="showTab('laws',      this)">חוקי ברזל</button>
-        <button class="tab-btn" onclick="_csvSwitchTab('positions')">פוזיציות</button>
-        <button class="tab-btn" onclick="_csvSwitchTab('pnl')">P&amp;L</button>
-        <button class="tab-btn" onclick="_csvSwitchTab('executions')">ביצועים</button>
+        <button class="tab-btn" onclick="_csvSwitchTab('positions',this)">פוזיציות</button>
+        <button class="tab-btn" onclick="_csvSwitchTab('pnl',this)">P&amp;L</button>
+        <button class="tab-btn" onclick="_csvSwitchTab('executions',this)">ביצועים</button>
   </div>
 
   <!-- ==================== DASHBOARD ==================== -->
@@ -1164,34 +1164,66 @@
     <div id="executions-table">טוען...</div>
   </div>
 
-<script>
+
+<script id="heb-headers-v1">
 (function(){
-const BASE = 'https://raw.githubusercontent.com/avi7756-design/a17-trading/main/';
-function parseCSV(t){
-  const L=t.trim().split('\n').filter(l=>l.trim());
-  if(L.length<2)return{headers:[],rows:[]};
-  const H=L[0].split(',').map(h=>h.trim().replace(/"/g,''));
-  const R=L.slice(1).map(l=>{const c=[];let s='',q=0;for(const x of l){if(x==='"')q=!q;else if(x===','&&!q){c.push(s.trim());s='';}else s+=x;}c.push(s.trim());return c;});
-  return{headers:H,rows:R};
+const HEB={"ClientAccountID": "מזהה חשבון", "AccountAlias": "שם חשבון", "Model": "מודל", "Currency": "מטבע", "CurrencyPrimary": "מטבע ראשי", "PrimaryFXRateToBase": "שער מט\"ח", "FXRateToBase": "שער מט\"ח", "FXCurrency": "מטבע FX", "FunctionalCurrency": "מטבע פונקציונלי", "AssetClass": "סוג נכס", "SubCategory": "קטגוריה", "Symbol": "סימול", "Description": "תיאור", "Conid": "קוד IB", "SecurityID": "מזהה ני\"ע", "SecurityIDType": "סוג מזהה", "CUSIP": "CUSIP", "ISIN": "ISIN", "FIGI": "FIGI", "ListingExchange": "בורסה", "UnderlyingConid": "קוד בסיס", "UnderlyingSymbol": "סימול בסיס", "UnderlyingSecurityID": "מזהה בסיס", "UnderlyingListingExchange": "בורסת בסיס", "Issuer": "מנפיק", "IssuerCountryCode": "מדינת מנפיק", "Multiplier": "מכפיל", "Strike": "מחיר מימוש", "Expiry": "פקיעה", "Put/Call": "פוט/קול", "ReportDate": "תאריך דוח", "Quantity": "כמות", "MarkPrice": "מחיר שוק", "PositionValue": "שווי פוזיציה", "OpenPrice": "מחיר פתיחה", "CostBasisPrice": "מחיר עלות", "CostBasisMoney": "עלות כסף", "CostPrice": "מחיר עלות", "CostBasis": "בסיס עלות", "PercentOfNAV": "% מ-NAV", "FifoPnlUnrealized": "רווח לא ממומש", "Side": "כיוון", "LevelOfDetail": "רמת פירוט", "OpenDateTime": "תאריך פתיחה", "HoldingPeriodDateTime": "תקופת החזקה", "Code": "קוד", "TradeID": "מזהה עסקה", "TradeDate": "תאריך עסקה", "DateTime": "תאריך ושעה", "TradeTime": "שעת עסקה", "SettleDate": "תאריך סליקה", "TransactionType": "סוג עסקה", "Exchange": "בורסה", "TradePrice": "מחיר עסקה", "TradeMoney": "סכום עסקה", "Proceeds": "תמורה", "Taxes": "מסים", "IBCommission": "עמלת IB", "IBCommissionCurrency": "מטבע עמלה", "NetCash": "מזומן נטו", "ClosePrice": "מחיר סגירה", "Open/CloseIndicator": "פתיחה/סגירה", "Notes/Codes": "הערות", "FifoPnlRealized": "רווח ממומש", "MtmPnl": "רווח MTM", "Buy/Sell": "קנייה/מכירה", "IBOrderID": "מזהה הוראה", "TransactionID": "מזהה עסקה", "OrderTime": "שעת הוראה", "OrderType": "סוג הוראה", "IsAPIOrder": "הוראת API", "FromDate": "מתאריך", "ToDate": "עד תאריך", "StartingCash": "מזומן פתיחה", "StartingCashSecurities": "ני\"ע - פתיחה", "StartingCashCommodities": "סחורות - פתיחה", "EndingCash": "מזומן סיום", "EndingCashSecurities": "ני\"ע - סיום", "EndingCashCommodities": "סחורות - סיום", "EndingSettledCash": "מזומן מסולק", "Buys": "קניות", "CommissionCredits": "זיכוי עמלות", "Dividends": "דיבידנדים", "BrokerFees": "דמי ברוקר", "Deposits": "הפקדות", "Withdrawals": "משיכות", "AccountTransfers": "העברות", "CreditLineBalance": "יתרת אשראי", "NetTradeableAssets": "נכסים סחירים נטו", "tFees": "עמלות", "NAV": "שווי נטו", "TWR": "תשואה TWR", "BeginningValue": "ערך פתיחה", "EndingValue": "ערך סיום", "Return": "תשואה", "NetDeposits": "הפקדות נטו", "CashFXGainLoss": "רווח/הפסד מט\"ח", "PrincipalAdjustFactor": "גורם התאמה", "AccruedInterest": "ריבית צבורה", "SerialNumber": "מספר סידורי", "DeliveryType": "סוג מסירה", "CommodityType": "סוג סחורה", "Fineness": "טוהר", "Weight": "משקל", "OrigTradePrice": "מחיר עסקה מקורי", "OrigTradeDate": "תאריך מקורי", "TargetTransactionType": "סוג עסקה יעד", "RelatedTradeID": "עסקה קשורה", "VolatilityOrderLinkExchOrderID": "מזהה הוראת תנודתיות"};
+
+const BASE='https://raw.githubusercontent.com/avi7756-design/a17-trading/main/';
+
+function translateHeaders(headers){
+  return headers.map(h=>HEB[h]||h);
 }
-function renderTable(d,id){
-  const el=document.getElementById(id);if(!el)return;
-  if(!d.rows.length){el.innerHTML='<p style="color:#888;padding:16px">אין נתונים</p>';return;}
-  let h='<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:13px">';
-  h+='<tr>'+d.headers.map(x=>`<th style="padding:8px 10px;background:#1a3a5c;color:#e0e8f0;text-align:right;white-space:nowrap">${x}</th>`).join('')+'</tr>';
-  d.rows.forEach((r,i)=>{h+=`<tr style="background:${i%2?'#112540':'#0d1f35'}">`;h+=r.map(c=>`<td style="padding:6px 10px;color:#c8d8e8;border-bottom:1px solid #1a3050;text-align:right;white-space:nowrap">${c||'-'}</td>`).join('');h+='</tr>';});
-  h+='</table></div>';el.innerHTML=h;
+
+function parseCSV(text){
+  const lines=text.split('\n').filter(l=>l.trim());
+  if(lines.length<2)return{h:[],r:[]};
+  const split=l=>{const c=[];let s='',q=false;for(const x of l){if(x==='"')q=!q;else if(x===','&&!q){c.push(s.trim());s='';}else s+=x;}c.push(s.trim());return c;};
+  const rawH=split(lines[0]).slice(0,12);
+  const headers=translateHeaders(rawH);
+  const rows=lines.slice(1).filter(l=>l.trim()).map(l=>split(l).slice(0,12));
+  return{h:headers,r:rows};
 }
+
+function render(d,id){
+  const el=document.getElementById(id);
+  if(!el)return;
+  if(!d.r.length){el.innerHTML='<p style="color:#aaa;padding:20px;text-align:center">אין נתונים</p>';return;}
+  let t='<div style="overflow-x:auto;direction:rtl">';
+  t+='<table style="width:100%;border-collapse:collapse;font-size:13px;direction:rtl">';
+  t+='<thead><tr>'+d.h.map(h=>`<th style="padding:8px 12px;background:#0f2a45;color:#7eb8e0;text-align:right;white-space:nowrap;border-bottom:2px solid #1a4a6a;font-weight:600">${h}</th>`).join('')+'</tr></thead>';
+  t+='<tbody>';
+  d.r.slice(0,50).forEach((r,i)=>{
+    const bg=i%2===0?'#091929':'#0d1f35';
+    t+=`<tr style="background:${bg}" onmouseover="this.style.background='#162f4a'" onmouseout="this.style.background='${bg}'">`;
+    t+=r.map(c=>`<td style="padding:7px 12px;color:#c8d8e8;border-bottom:1px solid #122030;text-align:right;white-space:nowrap">${c||'-'}</td>`).join('');
+    t+='</tr>';
+  });
+  t+='</tbody></table></div>';
+  if(d.r.length>50)t+=`<p style="color:#7eb8e0;padding:10px;font-size:12px;text-align:center">מציג 50 / ${d.r.length} שורות</p>`;
+  el.innerHTML=t;
+}
+
 async function loadCSV(file,id){
-  try{const r=await fetch(BASE+file+'?t='+Date.now());if(!r.ok)throw 0;renderTable(parseCSV(await r.text()),id);}
-  catch{const el=document.getElementById(id);if(el)el.innerHTML='<p style="color:#e05050;padding:16px">לא נמצא: '+file+'</p>';}
+  const el=document.getElementById(id);
+  if(el)el.innerHTML='<p style="color:#7eb8e0;padding:20px;text-align:center">⏳ טוען...</p>';
+  try{
+    const r=await fetch(BASE+file+'?t='+Date.now(),{cache:'no-store'});
+    if(!r.ok)throw new Error('שגיאת שרת '+r.status);
+    render(parseCSV(await r.text()),id);
+  }catch(e){
+    if(el)el.innerHTML='<p style="color:#e05050;padding:20px;text-align:center">⚠️ '+e.message+'</p>';
+  }
 }
-window._csvSwitchTab=function(name){
+
+window._csvSwitchTab=function(name,btn){
   document.querySelectorAll('.tab-content').forEach(e=>e.style.display='none');
-  const t=document.getElementById('tab-'+name);if(t)t.style.display='block';
-  if(name==='positions')loadCSV('do2_POSITIONS.csv','positions-table');
-  if(name==='pnl')loadCSV('do3_CASH_PNL.csv','pnl-table');
-  if(name==='executions')loadCSV('do1_EXECUTIONS.csv','executions-table');
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  const t=document.getElementById('tab-'+name);
+  if(t)t.style.display='block';
+  if(btn)btn.classList.add('active');
+  const map={positions:'do2_POSITIONS.csv',pnl:'do3_CASH_PNL.csv',executions:'do1_EXECUTIONS.csv'};
+  if(map[name])loadCSV(map[name],name+'-table');
 };
 })();
 </script>
